@@ -3,9 +3,14 @@ import { useEffect, useState } from "react";
 type QuizTimerProps = {
   timeout: number;
   onTimeout: () => void;
+  mode: string;
 };
 
-export default function QuizTimer({ timeout, onTimeout }: QuizTimerProps) {
+export default function QuizTimer({
+  timeout,
+  onTimeout,
+  mode,
+}: QuizTimerProps) {
   const [remainingTime, setRemainingTime] = useState(timeout);
 
   useEffect(() => {
@@ -16,7 +21,7 @@ export default function QuizTimer({ timeout, onTimeout }: QuizTimerProps) {
     return () => {
       clearTimeout(timer);
     };
-  }, [onTimeout]);
+  }, [onTimeout, timeout]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -29,6 +34,11 @@ export default function QuizTimer({ timeout, onTimeout }: QuizTimerProps) {
   }, []);
 
   return (
-    <progress id="question-time" max={timeout} value={remainingTime}></progress>
+    <progress
+      id="question-time"
+      max={timeout}
+      value={remainingTime}
+      className={mode}
+    />
   );
 }
