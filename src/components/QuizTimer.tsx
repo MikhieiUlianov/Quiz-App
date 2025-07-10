@@ -2,21 +2,24 @@ import { useEffect, useState } from "react";
 
 type QuizTimerProps = {
   timeout: number;
-  nextQuestion: () => void;
+  handleSkipAnswer: () => void;
 };
 
-export default function QuizTimer({ timeout, nextQuestion }: QuizTimerProps) {
+export default function QuizTimer({
+  timeout,
+  handleSkipAnswer,
+}: QuizTimerProps) {
   const [remainingTime, setRemainingTime] = useState(timeout);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      nextQuestion();
+      handleSkipAnswer();
     }, timeout);
 
     return () => {
       clearTimeout(timer);
     };
-  }, [nextQuestion]);
+  }, [handleSkipAnswer]);
 
   useEffect(() => {
     const interval = setInterval(() => {

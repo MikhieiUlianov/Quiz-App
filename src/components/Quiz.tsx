@@ -1,24 +1,38 @@
 import { useCallback, useState } from "react";
 import QUESTIONS from "../questions.js";
 import quizCompleteImg from "../assets/quiz-complete.png";
-import QuizTimer from "./QuizTimer.js";
+import Question from "./Question.js";
 
 export default function Quiz() {
+  const [answerState, setAnswerState] = useState("");
   const [userAnswers, setUserAnswers] = useState<Array<string | null>>([]);
 
-  const activeQuetionIndex = userAnswers.length;
+  const activeQuetionIndex =
+    answerState === "" ? userAnswers.length : userAnswers.length - 1;
   const quizIsComplete = activeQuetionIndex === QUESTIONS.length;
 
-  const handleSelectAnswer = useCallback(function handleSelectAnswer(
-    selectedAnswer: string | null
-  ) {
-    setUserAnswers((prevState) => {
-      return [...prevState, selectedAnswer];
-    });
-  },
-  []);
+  const handleSelectAnswer = useCallback(
+    function handleSelectAnswer(selectedAnswer: string | null) {
+      setAnswerState("answered");
+      setUserAnswers((prevState) => {
+        return [...prevState, selectedAnswer];
+      });
 
-  const onNextQuestion = useCallback(
+      setTimeout(() => {
+        if (selectedAnswer === QUESTIONS[activeQuetionIndex].answers[0]) {
+          setAnswerState("correct");
+        } else {
+          setAnswerState("wrong");
+        }
+        setTimeout(() => {
+          setAnswerState("");
+        }, 2000);
+      }, 1000);
+    },
+    [activeQuetionIndex]
+  );
+
+  const handleSkipAnswer = useCallback(
     () => handleSelectAnswer(null),
     [handleSelectAnswer]
   );
@@ -32,29 +46,18 @@ export default function Quiz() {
     );
   }
 
-  const shuffledAnswers = [...QUESTIONS[activeQuetionIndex].answers];
-  shuffledAnswers.sort(() => Math.random() - 0.5);
-
   return (
     <div id="quiz">
       <div id="question">
-        <QuizTimer
+        <Question
           key={activeQuetionIndex}
-          timeout={10000}
-          nextQuestion={onNextQuestion}
+          questionText={QUESTIONS[activeQuetionIndex].text}
+          answers={QUESTIONS[activeQuetionIndex].answers}
+          answerState={answerState}
+          selectedAnswer={userAnswers[userAnswers.length - 1]}
+          onSelectAnswer={handleSelectAnswer}
+          onSkipAnswer={handleSkipAnswer}
         />
-        <h2>{QUESTIONS[activeQuetionIndex].text}</h2>
-        <ul id="answers">
-          {shuffledAnswers.map((answer: string) => {
-            return (
-              <li key={answer} className="answer">
-                <button onClick={() => handleSelectAnswer(answer)}>
-                  {answer}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
       </div>
     </div>
   );
